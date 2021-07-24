@@ -180,6 +180,12 @@ plot_ly(visualizacion_orquideas, labels =  ~species, values = ~registros, type =
   config(locale = "es")
 ```
 
+row {data-height=10}
+-----------------------------------------------------------------------
+**Trabajo final realizado por:** Abigail Grijalba y Gabriela Becerra
+<br>
+**Curso:** Procesamiento de datos geográficos
+
 
 Mapa agrupado (clustered) de registros de presencia
 =======================================================================
