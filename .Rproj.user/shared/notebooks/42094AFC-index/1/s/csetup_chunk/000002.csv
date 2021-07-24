@@ -1,0 +1,30 @@
+"0","library(flexdashboard)"
+"0","library(raster)"
+"0","library(rmapshaper)"
+"0","library(dplyr)"
+"0","library(sf)"
+"0","library(DT)"
+"0","library(plotly)"
+"0","library(leafem)"
+"0","library(leaflet)"
+"0","library(leaflet.extras)"
+"0","library(flexdashboard)"
+"0","library(shiny)"
+"2","
+Attaching package: ‘shiny’
+
+"
+"2","The following objects are masked from ‘package:DT’:
+
+    dataTableOutput, renderDataTable
+
+"
+"0","orquideas <-"
+"0","  st_read("
+"0","    ""https://raw.githubusercontent.com/gf0604-procesamientodatosgeograficos/2021i-datos/main/gbif/orchidaceae-cr-registros.csv"","
+"0","    options = c("
+"0","      ""X_POSSIBLE_NAMES=decimalLongitude"","
+"0","      ""Y_POSSIBLE_NAMES=decimalLatitude"""
+"0","    ),"
+"0","    quiet = TRUE"
+"0","  )"
