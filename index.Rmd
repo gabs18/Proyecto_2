@@ -84,8 +84,7 @@ column {data-width=70}
 ### Registros de presencia {.value-box}
 ```{r}
 valueBox(value = nrow(orquideas), 
-         caption = "Registros de presencia", 
-         icon = "fas fa-fan",
+         caption = "Registros de presencia",
          color = "#906dbd"
 )
 ```
@@ -96,10 +95,9 @@ valueBox(value = nrow(orquideas),
 input <- orquideas %>%
   filter(!is.na(genus) & genus != "") %>%
   group_by(genus) %>% 
-  summarise(registros = n())
+  summarise(registros = n_distinct(genus, na.rm = TRUE))
 
 valueBox(value = nrow(input), 
-         icon = "fas fa-fan", 
          color = "#bb6dbd")
 ```
 
@@ -109,10 +107,9 @@ valueBox(value = nrow(input),
 input2 <- orquideas %>%
   filter(!is.na(species) & species != "") %>%
   group_by(species) %>% 
-  summarise(registros = n())
+  summarise(registros = n_distinct(species, na.rm = TRUE))
 
 valueBox(value = nrow(input2), 
-         icon = "fas fa-fan", 
          color = "#e087bc")
 ```
 
@@ -162,7 +159,7 @@ otros <-
   summarise(registros = n()) %>%
   arrange(desc(registros)) %>%
   slice(11:232) %>%
-  group_by(species = as.character("Otros")) %>%
+  group_by(species = as.character("Otras especies")) %>%
   summarise(registros = sum(registros))
 
 visualizacion_orquideas <-
@@ -197,7 +194,7 @@ orquideas_especies <-
   provincias %>%
   st_join(orquideas) %>%
   group_by(provincia.x) %>%
-  summarize(especies = n())
+  summarize(especies = n_distinct(species, na.rm = TRUE))
 
 # Paleta de colores
 colores_especies <-
@@ -206,15 +203,15 @@ colores_especies <-
                na.color = "transparent")
 
 # Mapa de registros de presencia
-orquideas %>%
-  select(species, 
-         canton,
-         stateProvince,
-         eventDate) %>%
-  leaflet() %>%
-  setView(lng = -84.0, lat = 10.0, zoom = 8) %>%
+leaflet() %>%
+  setView(lng = -84.0,
+          lat = 10.0,
+          zoom = 8) %>%
   addProviderTiles(providers$OpenStreetMap.Mapnik, group = "OpenStreetMap") %>%
   addProviderTiles(providers$Esri.WorldGrayCanvas, group = "Esri.WorldGrayCanvas") %>%
+  addTiles(urlTemplate = "https://mts1.google.com/vt/lyrs=s&hl=en&src=app&x={x}&y={y}&z={z}&s=G",
+           attribution = 'Google',
+           group = "Google") %>%
   addPolygons(
     data = orquideas_especies,
     fillColor = ~ colores_especies(orquideas_especies$especies),
@@ -222,33 +219,30 @@ orquideas %>%
     stroke = TRUE,
     color = "black",
     weight = 1,
-    group = "Registros por provincias" 
-    ) %>%
+    group = "Registros por provincias"
+  ) %>%
   addCircleMarkers(
+    data = orquideas,
     stroke = F,
     radius = 4,
     fillColor = "#c90094",
     fillOpacity = 1,
     popup = paste(
-      paste(
-        "<strong>Especie: </strong>", 
-        orquideas$species),
-      paste(
-        "<strong>Provincia: </strong>", 
-        orquideas$stateProvince),
-      paste(
-        "<strong>Cantón: </strong>", 
-        orquideas$canton),
-      paste(
-      "<strong>Fecha: </strong>", 
-      orquideas$eventDate),
+      paste("<strong>Especie: </strong>",
+            orquideas$species),
+      paste("<strong>Provincia: </strong>",
+            orquideas$stateProvince),
+      paste("<strong>Cantón: </strong>",
+            orquideas$canton),
+      paste("<strong>Fecha: </strong>",
+            orquideas$eventDate),
       sep = '<br/>'
     ),
     clusterOptions = markerClusterOptions(),
     group = "Registros de orquideas"
   ) %>%
   addLayersControl(
-    baseGroups = c("Esri.WorldGrayCanvas", "OpenStreetMap"),
+    baseGroups = c("Esri.WorldGrayCanvas", "OpenStreetMap", "Google"),
     overlayGroups = c("Registros por provincias", "Registros de orquideas")
   ) %>%
   addResetMapButton() %>%
@@ -265,7 +259,8 @@ orquideas %>%
     values = orquideas_especies$especies,
     pal = colores_especies,
     group = "Registros por provincias",
-    title = "Cantidad de <br>especies de<br>orquideas")
+    title = "Cantidad de <br>especies de<br>orquideas"
+  )
 ```
 
 
@@ -327,10 +322,14 @@ pal <-
 
 # Mapa de registros de presencia
 leaflet() %>%
-  setView(lng = -84.0, lat = 10.0, zoom = 8) %>%
+  setView(lng = -84.0,
+          lat = 10.0,
+          zoom = 8) %>%
   addProviderTiles(providers$OpenStreetMap.Mapnik, group = "OpenStreetMap") %>%
   addProviderTiles(providers$Esri.WorldGrayCanvas, group = "Esri.WorldGrayCanvas") %>%
-  addTiles(urlTemplate = "https://mts1.google.com/vt/lyrs=s&hl=en&src=app&x={x}&y={y}&z={z}&s=G", attribution = 'Google', group = "Google") %>%
+  addTiles(urlTemplate = "https://mts1.google.com/vt/lyrs=s&hl=en&src=app&x={x}&y={y}&z={z}&s=G",
+           attribution = 'Google',
+           group = "Google") %>%
   addPolygons(
     data = provincias,
     fillColor = FALSE,
@@ -338,7 +337,7 @@ leaflet() %>%
     stroke = TRUE,
     color = "black",
     weight = 1,
-    group = "Delimitación provincial" 
+    group = "Delimitación provincial"
   ) %>%
   addRasterImage(
     orquideas_raster_registros,
@@ -358,12 +357,12 @@ leaflet() %>%
     tiles = providers$Esri.WorldGrayCanvas,
     position = "bottomleft",
     toggleDisplay = TRUE
-  ) %>% 
+  ) %>%
   addLegend(
     pal = pal,
     values = values(orquideas_raster_registros),
     position = "bottomright",
     title = "Cantidad de <br>especies<br>por celda",
-    group = "Registros-Orquideas"
+    group = "Registros de orquídeas"
   )
 ```
